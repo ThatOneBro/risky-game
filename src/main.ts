@@ -1,6 +1,5 @@
-import { Graphics } from 'pixi.js';
-import { generateTiles, initGame, runGameLoop } from './game.ts';
-import { render } from './render.ts';
+import { Game, generateTiles } from './game.ts';
+import { Renderer } from './render.ts';
 import { setupStage } from './stage.ts';
 import './style.css';
 
@@ -10,7 +9,8 @@ import './style.css';
 
 (async () => {
   const app = await setupStage(document.querySelector<HTMLDivElement>('#stage') as HTMLDivElement);
-  initGame({
+
+  const game = new Game({
     tiles: generateTiles(20, 20),
     players: [
       { id: 0, name: 'Player 1' },
@@ -18,14 +18,12 @@ import './style.css';
     ],
   });
 
-  const graphics = new Graphics();
-  app.stage.addChild(graphics);
-
-  mainLoop(graphics);
+  const renderer = new Renderer(app);
+  mainLoop(game, renderer);
 })().catch(console.error);
 
-function mainLoop(graphics: Graphics) {
-  const state = runGameLoop();
-  render(graphics, state);
-  requestAnimationFrame(() => mainLoop(graphics));
+function mainLoop(game: Game, renderer: Renderer) {
+  game.tick();
+  renderer.render(game.getState());
+  requestAnimationFrame(() => mainLoop(game, renderer));
 }

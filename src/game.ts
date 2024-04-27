@@ -1,39 +1,64 @@
-export type Vec2 = {
+export class Vec2 {
   x: number;
   y: number;
-};
 
-export type Tile = {
-  position: Vec2;
-  troopCount: number;
-};
-
-export type TileState = Tile & { position: never };
-
-export type Player = {
-  id: number;
-  name?: string;
-};
-
-export type GameState = {
-  tiles: Tile[][];
-};
-
-export type GameInit = Partial<GameState> & { players: Player[] };
-
-let game: GameState;
-
-function createTile(tileState: Partial<Tile> & { position: Vec2 }): Tile {
-  return { position: tileState?.position, troopCount: tileState?.troopCount ?? 0 };
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
 }
 
-export function generateTiles(x: number, y: number, defaultTileState?: Partial<TileState>): Tile[][] {
+export type TileInit = {
+  position: Vec2;
+  troopCount?: number;
+  occupant?: Player;
+};
+
+export class Tile {
+  position: Vec2;
+  troopCount = 0;
+  occupant: Player | null;
+
+  constructor(init: TileInit) {
+    const { position, troopCount, occupant } = init;
+    this.position = position;
+    this.troopCount = troopCount ?? 0;
+    this.occupant = occupant ?? null;
+  }
+}
+
+export type PlayerInit = { id: number; name?: string };
+
+export class Player {
+  id: number;
+  name: string;
+
+  constructor(init: PlayerInit) {
+    const { id, name } = init;
+    this.id = id;
+    this.name = name ?? `Player ${id}`;
+  }
+}
+
+export type GameInit = { tiles: Tile[][]; players: PlayerInit[] };
+
+export class GameState {
+  tiles: Tile[][];
+  players: Player[];
+
+  constructor(init: GameInit) {
+    this.tiles = init.tiles ?? generateTiles(10, 5);
+    this.players = init.players.map((playerInit) => new Player(playerInit));
+  }
+}
+
+export function generateTiles(x: number, y: number, defaultTileState?: TileInit): Tile[][] {
   const tiles = [] as Tile[][];
 
   for (let i = 0; i < x; i++) {
     const row = [];
     for (let j = 0; j < y; j++) {
-      row[j] = createTile({ ...defaultTileState, position: { x: i, y: j } });
+      row[j] = new Tile({ ...defaultTileState, position: new Vec2(i, j) });
     }
     tiles[i] = row;
   }
@@ -41,8 +66,17 @@ export function generateTiles(x: number, y: number, defaultTileState?: Partial<T
   return tiles;
 }
 
-export function getTileByPosition(game: GameState, position: Vec2): Tile {
-  return game.tiles[position.x][position.y];
+export class Game {
+  private state: GameState;
+  constructor(init: GameInit) {
+    this.state = new GameState(init);
+  }
+  tick(): void {
+    this.state = runSystems(this.state);
+  }
+  getState(): GameState {
+    return this.state;
+  }
 }
 
 function runSystems(game: GameState): GameState {
@@ -50,11 +84,10 @@ function runSystems(game: GameState): GameState {
   return game;
 }
 
-// Consider passing an array of events to apply
-export function runGameLoop(): GameState {
-  return runSystems(game);
+export function getTileByPosition(game: GameState, position: Vec2): Tile {
+  return game.tiles[position.x][position.y];
 }
 
-export function initGame(init: GameInit): void {
-  game = { tiles: init.tiles ?? generateTiles(10, 5) };
+export function deepCompareState(state1: GameState, state2: GameState): boolean {
+  return JSON.stringify(state1) === JSON.stringify(state2);
 }
