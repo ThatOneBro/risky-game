@@ -1,0 +1,84 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.7.1/schema.json",
+  "organizeImports": {
+    "enabled": false
+  },
+  "formatter": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUndeclaredVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "style": {
+        "useImportType": "off",
+
+        "useTemplate": "warn",
+        "noUnusedTemplateLiteral": "warn",
+        "useSelfClosingElements": "warn",
+        "useExponentiationOperator": "warn",
+        "useSingleVarDeclarator": "warn",
+        "useEnumInitializers": "warn",
+
+        "useBlockStatements": "error",
+        "noParameterAssign": "error",
+        "useCollapsedElseIf": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noAssignInExpressions": "warn",
+        "noConsoleLog": "warn"
+      },
+      "complexity": {
+        "useLiteralKeys": "warn",
+        "useFlatMap": "warn",
+        "noUselessFragments": "warn",
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
+        },
+
+        "noForEach": "warn",
+        "useSimplifiedLogicExpression": "warn"
+      },
+      "performance": {
+        "noDelete": "warn"
+      },
+      "a11y": {
+        "noBlankTarget": "off",
+
+        "noRedundantAlt": "warn",
+        "useValidAnchor": "warn",
+        "noSvgWithoutTitle": "warn",
+        "useKeyWithClickEvents": "warn",
+        "useIframeTitle": "warn",
+        "useKeyWithMouseEvents": "warn",
+        "useButtonType": "warn",
+        "noPositiveTabindex": "warn",
+        "useMediaCaption": "warn",
+        "useAltText": "warn"
+      },
+      "nursery": {
+        "noDuplicateElseIf": "error",
+        "noUndeclaredDependencies": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingComma": "es5",
+      "lineWidth": 120
+    }
+  },
+  "files": {
+    "ignore": ["**/dist/**/*", "**/build/**/*", "**/.next/**/*"]
+  }
+}
