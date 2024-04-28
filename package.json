@@ -7,7 +7,7 @@
     "dev": "bunx --bun vite",
     "build": "tsc && bunx --bun vite build",
     "preview": "bunx --bun vite preview",
-    "deploy": "bunx wrangler pages deploy dist"
+    "deploy": "bun --bun run build && bunx wrangler pages deploy dist"
   },
   "dependencies": {
     "pixi.js": "8.1.0"
