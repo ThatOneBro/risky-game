@@ -59,7 +59,6 @@ export class Renderer {
           .stroke({ width: 2, color: 0xfeeb77 });
 
         if (tile.troopCount) {
-          console.log(tile);
           const oldText = tileText.get(tile);
           if (oldText) {
             app.stage.removeChild(oldText);
