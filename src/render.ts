@@ -1,8 +1,8 @@
 import { Application, Graphics, Text, TextOptions } from 'pixi.js';
-import { GameState, Tile, deepCompareState } from './game';
+import { Game, Tile } from './game';
 import { randomInt } from './util';
 
-export const TILE_SIZE = 40;
+export const TILE_SIZE = 50;
 
 export enum Color {
   UNOCCUPIED = 0x242424,
@@ -25,34 +25,34 @@ export function getRandomColor() {
 export class Renderer {
   app: Application;
   graphics: Graphics;
-  prevState: GameState | null;
+  prevState: number;
   tileText: Map<Tile, Text>;
 
   constructor(app: Application) {
     this.app = app;
     this.graphics = new Graphics();
-    this.prevState = null;
+    this.prevState = -1;
     this.tileText = new Map();
 
     app.stage.addChild(this.graphics);
   }
 
-  render(state: GameState): void {
+  render(game: Game): void {
     const { prevState } = this;
-    if (prevState && deepCompareState(prevState, state)) {
+    if (prevState === game.state) {
       return;
     }
-    this.rerender(state);
-    this.prevState = state;
+    this.rerender(game);
+    this.prevState = game.state;
   }
 
-  private rerender(state: GameState): void {
+  private rerender(game: Game): void {
     const { app, graphics, tileText } = this;
 
     graphics.clear();
-    for (let i = 0; i < state.tiles.length; i++) {
-      for (let j = 0; j < state.tiles[0].length; j++) {
-        const tile = state.tiles[i][j];
+    for (let i = 0; i < game.tiles.length; i++) {
+      for (let j = 0; j < game.tiles[0].length; j++) {
+        const tile = game.tiles[i][j];
         graphics
           .rect(TILE_SIZE * i, TILE_SIZE * j, TILE_SIZE, TILE_SIZE)
           .fill(tile.occupant?.color ?? Color.UNOCCUPIED)
@@ -72,8 +72,8 @@ export class Renderer {
             },
           } satisfies TextOptions);
           app.stage.addChild(text);
-          text.x = TILE_SIZE * i + TILE_SIZE / 3;
-          text.y = TILE_SIZE * j + TILE_SIZE / 5.5;
+          text.x = TILE_SIZE * i + TILE_SIZE * 0.35;
+          text.y = TILE_SIZE * j + TILE_SIZE * 0.25;
         }
       }
     }

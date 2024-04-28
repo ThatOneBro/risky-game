@@ -11,7 +11,7 @@ import './style.css';
   container.appendChild(app.canvas);
 
   const game = new Game({
-    tiles: generateTiles(20, 20),
+    tiles: generateTiles(8, 8),
     players: [
       { id: 0, name: 'Player 1' },
       { id: 1, name: 'Player 2' },
@@ -23,7 +23,6 @@ import './style.css';
 })().catch(console.error);
 
 function mainLoop(game: Game, renderer: Renderer) {
-  game.tick();
-  renderer.render(game.getState());
+  renderer.render(game);
   requestAnimationFrame(() => mainLoop(game, renderer));
 }

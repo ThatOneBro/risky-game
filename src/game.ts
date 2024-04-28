@@ -1,6 +1,7 @@
 import { Color, getRandomColor } from './render';
 import { randomInt } from './util';
 
+export const STARTING_TROOPS = 2;
 export const GROWTH_PERCENTAGE = 0.1;
 
 export class Vec2 {
@@ -53,7 +54,7 @@ export class Player {
 
 export type GameInit = { tiles: Tile[][]; players: (Partial<PlayerInit> & { id: number })[]; round?: number };
 
-export class GameState {
+export class Game {
   tiles: Tile[][];
   assignedColors: Set<Color>;
   players: Player[];
@@ -61,6 +62,8 @@ export class GameState {
   playerTurnsRemaining: Player[];
 
   occupied: Set<Tile>;
+
+  state = 0;
 
   constructor(init: GameInit) {
     this.tiles = init.tiles ?? generateTiles(10, 5);
@@ -78,14 +81,14 @@ export class GameState {
       } while (randomTile.isOccupied());
 
       randomTile.occupant = player;
-      randomTile.troopCount += 3;
+      randomTile.troopCount += STARTING_TROOPS;
       this.occupied.add(randomTile);
     }
 
     this.maybeStartNewRound();
   }
 
-  assignColor(): Color {
+  private assignColor(): Color {
     const { assignedColors } = this;
 
     let randomColor: Color;
@@ -112,7 +115,7 @@ export class GameState {
     return tiles[x][y];
   }
 
-  maybeStartNewRound(): void {
+  private maybeStartNewRound(): void {
     if (this.playerTurnsRemaining.length) {
       return;
     }
@@ -136,6 +139,7 @@ export class GameState {
     }
     const player = this.playerTurnsRemaining.shift() as Player;
     this.maybeStartNewRound();
+    this.state += 1;
     return player;
   }
 }
@@ -150,26 +154,4 @@ export function generateTiles(x: number, y: number, defaultTileState?: TileInit)
     tiles[i] = row;
   }
   return tiles;
-}
-
-export class Game {
-  private state: GameState;
-  constructor(init: GameInit) {
-    this.state = new GameState(init);
-  }
-  tick(): void {
-    this.state = runSystems(this.state);
-  }
-  getState(): GameState {
-    return this.state;
-  }
-}
-
-function runSystems(game: GameState): GameState {
-  // Increase troop count on next turn
-  return game;
-}
-
-export function deepCompareState(state1: GameState, state2: GameState): boolean {
-  return JSON.stringify(state1) === JSON.stringify(state2);
 }
