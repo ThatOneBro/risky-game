@@ -3,10 +3,6 @@ import { Renderer } from './render.ts';
 import { setupStage } from './stage.ts';
 import './style.css';
 
-(document.querySelector<HTMLDivElement>('#app') as HTMLDivElement).innerHTML = `
-  <div id="stage"></div>
-`;
-
 (async () => {
   const app = await setupStage(document.querySelector<HTMLDivElement>('#stage') as HTMLDivElement);
 

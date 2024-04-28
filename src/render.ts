@@ -1,9 +1,25 @@
 import { Application, Graphics } from 'pixi.js';
 import { GameState, deepCompareState } from './game';
+import { randomInt } from './util';
+
+export const TILE_SIZE = 40;
 
 export enum Color {
   UNOCCUPIED = 0x242424,
   PURPLE = 0x650a5a,
+  GREEN = 0x00cc66,
+}
+const NUM_COLORS = 2;
+
+export function getRandomColor() {
+  switch (randomInt(1, NUM_COLORS)) {
+    case 1:
+      return Color.PURPLE;
+    case 2:
+      return Color.GREEN;
+    default:
+      return Color.UNOCCUPIED;
+  }
 }
 
 export class Renderer {
@@ -32,10 +48,11 @@ function maybeRender(graphics: Graphics, prevState: GameState | null, state: Gam
 }
 
 function rerender(graphics: Graphics, state: GameState) {
-  for (let i = 0; i < state.tiles.length - 1; i++) {
-    for (let j = 0; j < state.tiles[0].length - 1; j++) {
-      graphics.rect(50 * i, 50 * j, 50, 50);
-      graphics.fill(Color.PURPLE);
+  for (let i = 0; i < state.tiles.length; i++) {
+    for (let j = 0; j < state.tiles[0].length; j++) {
+      const tile = state.tiles[i][j];
+      graphics.rect(TILE_SIZE * i, TILE_SIZE * j, TILE_SIZE, TILE_SIZE);
+      graphics.fill(tile.occupant?.color ?? Color.UNOCCUPIED);
       graphics.stroke({ width: 2, color: 0xfeeb77 });
     }
   }

@@ -1,3 +1,6 @@
+import { Color, getRandomColor } from './render';
+import { randomInt } from './util';
+
 export class Vec2 {
   x: number;
   y: number;
@@ -25,30 +28,77 @@ export class Tile {
     this.troopCount = troopCount ?? 0;
     this.occupant = occupant ?? null;
   }
+
+  isOccupied(): boolean {
+    return !!this.occupant;
+  }
 }
 
-export type PlayerInit = { id: number; name?: string };
+export type PlayerInit = { id: number; name?: string; color: Color };
 
 export class Player {
   id: number;
   name: string;
+  color: Color;
 
   constructor(init: PlayerInit) {
     const { id, name } = init;
     this.id = id;
     this.name = name ?? `Player ${id}`;
+    this.color = init.color;
   }
 }
 
-export type GameInit = { tiles: Tile[][]; players: PlayerInit[] };
+export type GameInit = { tiles: Tile[][]; players: (Partial<PlayerInit> & { id: number })[] };
 
 export class GameState {
   tiles: Tile[][];
+  assignedColors: Set<Color>;
   players: Player[];
 
   constructor(init: GameInit) {
     this.tiles = init.tiles ?? generateTiles(10, 5);
-    this.players = init.players.map((playerInit) => new Player(playerInit));
+    this.assignedColors = new Set();
+    this.players = init.players.map((playerInit) => new Player({ ...playerInit, color: this.assignColor() }));
+
+    for (const player of this.players) {
+      let randomTile: Tile;
+      do {
+        randomTile = this.getRandomTile();
+      } while (randomTile.isOccupied());
+
+      console.log(randomTile.position);
+
+      randomTile.occupant = player;
+    }
+  }
+
+  assignColor(): Color {
+    const { assignedColors } = this;
+
+    let randomColor: Color;
+    do {
+      randomColor = getRandomColor();
+    } while (assignedColors.has(randomColor));
+
+    console.log(randomColor);
+    assignedColors.add(randomColor);
+    return randomColor;
+  }
+
+  getRandomTile(): Tile {
+    const tiles = this.tiles;
+    const randomX = randomInt(0, tiles.length - 1);
+    const randomY = randomInt(0, tiles[0].length - 1);
+    return tiles[randomX][randomY];
+  }
+
+  getTileByPosition(x: number, y: number): Tile {
+    const tiles = this.tiles;
+    if (x < 0 || x >= tiles.length || y < 0 || y >= tiles[0].length) {
+      throw new Error(`${x},${y} in out of bounds!`);
+    }
+    return tiles[x][y];
   }
 }
 
@@ -82,10 +132,6 @@ export class Game {
 function runSystems(game: GameState): GameState {
   // Increase troop count on next turn
   return game;
-}
-
-export function getTileByPosition(game: GameState, position: Vec2): Tile {
-  return game.tiles[position.x][position.y];
 }
 
 export function deepCompareState(state1: GameState, state2: GameState): boolean {
