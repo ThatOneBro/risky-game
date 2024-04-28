@@ -67,8 +67,6 @@ export class GameState {
         randomTile = this.getRandomTile();
       } while (randomTile.isOccupied());
 
-      console.log(randomTile.position);
-
       randomTile.occupant = player;
     }
   }
@@ -81,7 +79,6 @@ export class GameState {
       randomColor = getRandomColor();
     } while (assignedColors.has(randomColor));
 
-    console.log(randomColor);
     assignedColors.add(randomColor);
     return randomColor;
   }
