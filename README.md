@@ -11,6 +11,7 @@ __TODO: write a better README__
 - [ ] While having your own tile selected, clicking on a nearby tile should move all but one troops to that tile
 - [ ] If moving into a tile that is occupied, add or subtract troops if own tile or enemy tile
 - [ ] Add battle resolution mechanics (chance + modifiers)
+- [ ] Add turn system
 
 ## Way later
 - [ ] Add map modifiers (entrenchment? penalty on attacker when crossing a river, going into mountains, etc.) 
