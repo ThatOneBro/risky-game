@@ -1,6 +1,8 @@
 import { Color, getRandomColor } from './render';
 import { randomInt } from './util';
 
+export const GROWTH_PERCENTAGE = 0.1;
+
 export class Vec2 {
   x: number;
   y: number;
@@ -49,17 +51,25 @@ export class Player {
   }
 }
 
-export type GameInit = { tiles: Tile[][]; players: (Partial<PlayerInit> & { id: number })[] };
+export type GameInit = { tiles: Tile[][]; players: (Partial<PlayerInit> & { id: number })[]; round?: number };
 
 export class GameState {
   tiles: Tile[][];
   assignedColors: Set<Color>;
   players: Player[];
+  round: number;
+  playerTurnsRemaining: Player[];
+
+  occupied: Set<Tile>;
 
   constructor(init: GameInit) {
     this.tiles = init.tiles ?? generateTiles(10, 5);
     this.assignedColors = new Set();
     this.players = init.players.map((playerInit) => new Player({ ...playerInit, color: this.assignColor() }));
+    this.round = 0;
+    this.playerTurnsRemaining = [];
+
+    this.occupied = new Set();
 
     for (const player of this.players) {
       let randomTile: Tile;
@@ -68,7 +78,11 @@ export class GameState {
       } while (randomTile.isOccupied());
 
       randomTile.occupant = player;
+      randomTile.troopCount += 3;
+      this.occupied.add(randomTile);
     }
+
+    this.maybeStartNewRound();
   }
 
   assignColor(): Color {
@@ -97,11 +111,37 @@ export class GameState {
     }
     return tiles[x][y];
   }
+
+  maybeStartNewRound(): void {
+    if (this.playerTurnsRemaining.length) {
+      return;
+    }
+    this.playerTurnsRemaining.push(...this.players);
+    this.round++;
+    for (const tile of this.occupied) {
+      tile.troopCount += Math.ceil(tile.troopCount * GROWTH_PERCENTAGE);
+    }
+  }
+
+  peekNextPlayerTurn(): Player {
+    if (!this.playerTurnsRemaining.length) {
+      throw new Error('No player currently taking a turn!');
+    }
+    return this.playerTurnsRemaining[0];
+  }
+
+  completePlayerTurn(): Player {
+    if (!this.playerTurnsRemaining.length) {
+      throw new Error('No player currently taking a turn!');
+    }
+    const player = this.playerTurnsRemaining.shift() as Player;
+    this.maybeStartNewRound();
+    return player;
+  }
 }
 
 export function generateTiles(x: number, y: number, defaultTileState?: TileInit): Tile[][] {
   const tiles = [] as Tile[][];
-
   for (let i = 0; i < x; i++) {
     const row = [];
     for (let j = 0; j < y; j++) {
@@ -109,7 +149,6 @@ export function generateTiles(x: number, y: number, defaultTileState?: TileInit)
     }
     tiles[i] = row;
   }
-
   return tiles;
 }
 

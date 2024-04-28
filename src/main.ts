@@ -1,10 +1,14 @@
+import { Application } from 'pixi.js';
 import { Game, generateTiles } from './game.ts';
 import { Renderer } from './render.ts';
-import { setupStage } from './stage.ts';
 import './style.css';
 
 (async () => {
-  const app = await setupStage(document.querySelector<HTMLDivElement>('#stage') as HTMLDivElement);
+  const container = document.querySelector<HTMLDivElement>('#stage') as HTMLDivElement;
+  const app = new Application();
+  await app.init({ antialias: true, resizeTo: container, preference: 'webgpu' });
+
+  container.appendChild(app.canvas);
 
   const game = new Game({
     tiles: generateTiles(20, 20),
