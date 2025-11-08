@@ -126,11 +126,8 @@ export class Game {
     }
   }
 
-  peekNextPlayerTurn(): Player {
-    if (!this.playerTurnsRemaining.length) {
-      throw new Error('No player currently taking a turn!');
-    }
-    return this.playerTurnsRemaining[0];
+  peekNextPlayerTurn(): Player | null {
+    return this.playerTurnsRemaining[0] ?? null;
   }
 
   completePlayerTurn(): Player {
